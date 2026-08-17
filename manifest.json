@@ -1,0 +1,21 @@
+{
+  "name": "Radio Mada",
+  "short_name": "Radio Mada",
+  "description": "Radios malagasy en direct",
+  "start_url": "/radio-mada/",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "https://flagcdn.com/w192/mg.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://flagcdn.com/w512/mg.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
