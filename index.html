@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Radio Mada</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f1a;
+      color: #f0ede6;
+      font-family: 'Georgia', serif;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      padding: 24px 20px 16px;
+      border-bottom: 2px solid #e63946;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .flag { font-size: 2rem; }
+
+    header h1 {
+      font-size: 1.6rem;
+      letter-spacing: 0.04em;
+      color: #f0ede6;
+    }
+
+    header p {
+      font-size: 0.75rem;
+      color: #a0a0b0;
+      font-family: monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Lecteur fixé en bas */
+    #player-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #16213e;
+      border-top: 2px solid #e63946;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 100;
+      min-height: 72px;
+    }
+
+    #player-bar.hidden { display: none; }
+
+    #btn-play {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: #e63946;
+      border: none;
+      color: white;
+      font-size: 1.3rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    #btn-play:active { background: #c1121f; }
+
+    #player-info { flex: 1; overflow: hidden; }
+
+    #player-name {
+      font-size: 0.95rem;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #player-status {
+      font-size: 0.72rem;
+      color: #a0a0b0;
+      font-family: monospace;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #e63946;
+      margin-right: 5px;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Liste */
+    #radio-list {
+      padding: 16px 16px 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .radio-card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .radio-card:active,
+    .radio-card.active {
+      border-color: #e63946;
+      background: #1e1e38;
+    }
+
+    .radio-icon {
+      width: 44px; height: 44px;
+      border-radius: 8px;
+      background: #e63946;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .radio-info { flex: 1; }
+
+    .radio-name {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .radio-desc {
+      font-size: 0.75rem;
+      color: #a0a0b0;
+      font-family: monospace;
+    }
+
+    .radio-arrow {
+      color: #3a3a6a;
+      font-size: 1.1rem;
+    }
+
+    .radio-card.active .radio-arrow { color: #e63946; }
+
+    audio { display: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="flag">🇲🇬</div>
+  <div>
+    <h1>Radio Mada</h1>
+    <p>Hira sy vaovao</p>
+  </div>
+</header>
+
+<div id="radio-list"></div>
+
+<div id="player-bar" class="hidden">
+  <button id="btn-play">▶</button>
+  <div id="player-info">
+    <div id="player-name">—</div>
+    <div id="player-status"><span class="dot"></span>En direct</div>
+  </div>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+  const radios = [
+    {
+      name: "RDJ Radio",
+      desc: "Hits & info • Antananarivo",
+      icon: "🎵",
+      url: "https://stream.zeno.fm/yn65m0q9p7zuv"
+    },
+    {
+      name: "Radio Don Bosco",
+      desc: "Catholique • National",
+      icon: "✝️",
+      url: "https://stream.zeno.fm/4d61yk1mhs8uv"
+    },
+    {
+      name: "Antsiva Radio",
+      desc: "Kultur & mozika",
+      icon: "🌊",
+      url: "https://stream.zeno.fm/f3e8bmts3p8uv"
+    },
+    {
+      name: "Soa i Madagasikara",
+      desc: "Mozika malagasy • Diaspora",
+      icon: "🌍",
+      url: "https://radio.soaimadagasikara.org/stream"
+    },
+    {
+      name: "Radio Fahazavana",
+      desc: "Protestante • Nationale",
+      icon: "☀️",
+      url: "https://stream.zeno.fm/0r0xa792kwzuv"
+    },
+    {
+      name: "MBS Radio",
+      desc: "Malagasy Broadcasting System",
+      icon: "📻",
+      url: "https://stream.zeno.fm/wv9znmts3p8uv"
+    }
+  ];
+
+  const audio = document.getElementById('audio');
+  const playerBar = document.getElementById('player-bar');
+  const btnPlay = document.getElementById('btn-play');
+  const playerName = document.getElementById('player-name');
+  const playerStatus = document.getElementById('player-status');
+  const list = document.getElementById('radio-list');
+
+  let currentIndex = null;
+  let playing = false;
+
+  // Construction de la liste
+  radios.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'radio-card';
+    card.id = 'card-' + i;
+    card.innerHTML = `
+      <div class="radio-icon">${r.icon}</div>
+      <div class="radio-info">
+        <div class="radio-name">${r.name}</div>
+        <div class="radio-desc">${r.desc}</div>
+      </div>
+      <div class="radio-arrow">▶</div>
+    `;
+    card.addEventListener('click', () => selectRadio(i));
+    list.appendChild(card);
+  });
+
+  function selectRadio(i) {
+    // Si même radio : toggle play/pause
+    if (currentIndex === i) {
+      togglePlay();
+      return;
+    }
+
+    // Nouvelle radio
+    document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('active'));
+    document.getElementById('card-' + i).classList.add('active');
+
+    currentIndex = i;
+    const r = radios[i];
+    playerName.textContent = r.name;
+    playerStatus.innerHTML = '<span class="dot"></span>Chargement...';
+    playerBar.classList.remove('hidden');
+
+    audio.src = r.url;
+    audio.load();
+    audio.play().then(() => {
+      playing = true;
+      btnPlay.textContent = '⏸';
+      playerStatus.innerHTML = '<span class="dot"></span>En direct';
+    }).catch(() => {
+      playerStatus.innerHTML = '⚠️ Flux indisponible';
+    });
+  }
+
+  function togglePlay() {
+    if (playing) {
+      audio.pause();
+      playing = false;
+      btnPlay.textContent = '▶';
+      playerStatus.innerHTML = '⏸ En pause';
+    } else {
+      audio.play().then(() => {
+        playing = true;
+        btnPlay.textContent = '⏸';
+        playerStatus.innerHTML = '<span class="dot"></span>En direct';
+      });
+    }
+  }
+
+  btnPlay.addEventListener('click', togglePlay);
+</script>
+</body>
+</html>
