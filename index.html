@@ -41,7 +41,6 @@
       text-transform: uppercase;
     }
 
-    /* Lecteur fixé en bas */
     #player-bar {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -101,7 +100,6 @@
       50% { opacity: 0.3; }
     }
 
-    /* Liste */
     #radio-list {
       padding: 16px 16px 100px;
       display: flex;
@@ -186,40 +184,34 @@
 <script>
   const radios = [
     {
-      name: "RDJ Radio",
+      name: "RDJ 96.6 FM",
       desc: "Hits & info • Antananarivo",
       icon: "🎵",
-      url: "https://stream.zeno.fm/yn65m0q9p7zuv"
+      url: "https://rdj.mg/stream"
     },
     {
-      name: "Radio Don Bosco",
-      desc: "Catholique • National",
-      icon: "✝️",
-      url: "https://stream.zeno.fm/4d61yk1mhs8uv"
-    },
-    {
-      name: "Antsiva Radio",
-      desc: "Kultur & mozika",
-      icon: "🌊",
-      url: "https://stream.zeno.fm/f3e8bmts3p8uv"
-    },
-    {
-      name: "Soa i Madagasikara",
-      desc: "Mozika malagasy • Diaspora",
-      icon: "🌍",
-      url: "https://radio.soaimadagasikara.org/stream"
-    },
-    {
-      name: "Radio Fahazavana",
-      desc: "Protestante • Nationale",
-      icon: "☀️",
-      url: "https://stream.zeno.fm/0r0xa792kwzuv"
-    },
-    {
-      name: "MBS Radio",
-      desc: "Malagasy Broadcasting System",
+      name: "Top Radio 102.8",
+      desc: "Gasy 100% • Antananarivo",
       icon: "📻",
-      url: "https://stream.zeno.fm/wv9znmts3p8uv"
+      url: "https://streaming.radioking.io/topradio-102-8"
+    },
+    {
+      name: "Alliance 92 FM",
+      desc: "Français & Top 40 • 92.0 FM",
+      icon: "🔵",
+      url: "https://stream.zeno.fm/alliance92"
+    },
+    {
+      name: "Record FM 92.4",
+      desc: "92.4 FM • Antananarivo",
+      icon: "🔴",
+      url: "https://stream.zeno.fm/recordfm924"
+    },
+    {
+      name: "Studio Sifaka",
+      desc: "Jeunes & info • 16h-18h",
+      icon: "🦊",
+      url: "https://stream.zeno.fm/studiosifaka"
     }
   ];
 
@@ -233,7 +225,6 @@
   let currentIndex = null;
   let playing = false;
 
-  // Construction de la liste
   radios.forEach((r, i) => {
     const card = document.createElement('div');
     card.className = 'radio-card';
@@ -251,13 +242,11 @@
   });
 
   function selectRadio(i) {
-    // Si même radio : toggle play/pause
     if (currentIndex === i) {
       togglePlay();
       return;
     }
 
-    // Nouvelle radio
     document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('active'));
     document.getElementById('card-' + i).classList.add('active');
 
@@ -274,6 +263,7 @@
       btnPlay.textContent = '⏸';
       playerStatus.innerHTML = '<span class="dot"></span>En direct';
     }).catch(() => {
+      playing = false;
       playerStatus.innerHTML = '⚠️ Flux indisponible';
     });
   }
